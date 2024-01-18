@@ -6,12 +6,14 @@ function TableHeader() {
       <tr>
         <th>Name</th>
         <th>Job</th>
+        <th>Remove</th>
       </tr>
     </thead>
   );
 }
 
 function TableBody(props) {
+  console.log(`Proper ${props.characterData}`)
   const rows = props.characterData.map((row, index) => {
     return (
       <tr key={index}>
@@ -23,9 +25,14 @@ function TableBody(props) {
           </button>
         </td>
       </tr>
-      );
-    }
-  )
+    );
+   }
+  );
+  return (
+      <tbody>
+        {rows}
+       </tbody>
+   );
 }
 
 function Table(props) {
