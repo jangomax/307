@@ -1,4 +1,5 @@
 import express from "express";
+import cors from 'cors';
 
 const app = express();
 const port = 8000;
@@ -33,6 +34,7 @@ const users = {
   ]
 };
 
+app.use(cors());
 app.use(express.json());
 
 app.get("/", (req, res) => {
@@ -73,15 +75,23 @@ app.get("/users/:id", (req, res) => {
 });
 
 app.post("/users", (req, res) => {
-  const userToAdd = req.body;
+  const userToAdd = {
+    name: req.body.name,
+    job: req.body.job,
+    id: generateId()
+  }
   addUser(userToAdd);
-  res.send();
+  res.status(201).send(userToAdd);
 });
 
-app.delete("/users", (req, res) => {
-  const id = req.body["id"];
+app.delete("/users/:id", (req, res) => {
+  const id = req.params["id"];
+  if (findUserById(id) == undefined) {
+    res.status(404).send()
+    return
+  }
   removeUserById(id)
-  res.send()
+  res.status(204).send()
 })
 
 const addUser = (user) => {
@@ -90,7 +100,12 @@ const addUser = (user) => {
 };
 
 const removeUserById = (id) => {
-  users["users_list"] = users["users_list"].filter(u => u["id"] !== id) }
+  if (users["users_list"].every(u => u["id"] !== id)) {
+    return false /* Not found */
+  }
+  users["users_list"] = users["users_list"].filter(u => u["id"] !== id)
+  return true
+}
 
 const findUserByName = (name) => {
   return users["users_list"].filter(
@@ -107,3 +122,7 @@ const findUserByNameAndJob = (name, job) => {
 const findUserById = (id) =>
   users["users_list"].find((user) => user["id"] === id);
 
+
+const generateId = () => {
+  return `${Math.floor(Math.random() * 2147483647)}`
+}
